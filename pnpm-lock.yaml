@@ -71,7 +71,7 @@ devDependencies:
     specifier: ^8.4.24
     version: 8.4.33
   stylelint:
-    specifier: ^15.7.0
+    specifier: ^15.11.0
     version: 15.11.0(typescript@5.3.3)
   stylelint-config-idiomatic-order:
     specifier: ^9.0.0
