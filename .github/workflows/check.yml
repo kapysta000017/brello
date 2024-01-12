@@ -1,0 +1,89 @@
+name: Checking CI
+
+on:
+  pull_request: # срабатывает на каждый pull request
+  push: # срабатывает на push в ветку main
+    branches: -main
+
+jobs: # последовательны
+  code: # ключ джобы, произвольный
+    name: 😎 Checking code # имя джобы
+    runs-on: ubuntu-latest
+
+    steps: # actions
+      - name: 👏 Checkout
+        uses: actions/checkout@v3 # скачивает репу
+
+      - name: 💋 Use Node.js v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 🌹 Enable corepack
+        run: corepack enable # берет версию packageManager из package.json, corepack устанавливается с node; enable - corepack эксперементальный
+
+      - name: 🎁 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          run_install: false # не устанавливает зависимости на этом этапе
+
+      - name: 🧨 Get pnpm store directory # store path - путь к хранению пакетов, пакеты кешируется для следующих actions
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: 📦 Setup pnpm cache # ключ для кеша
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 🔍 Install dependencies # только сейчас устанавливаются зависимости
+        run: pnpm install
+
+      - name: ✅ Check code
+        run: pnpm lint:js
+
+  styles: # тоже что сверху, можно закомпозировать
+    name: 🎨 Checking styles
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⏬ Checkout
+        uses: actions/checkout@v3
+
+      - name: 🐧 Use Node.js v18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: ⚙️ Enable corepack
+        run: corepack enable
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          run_install: false
+
+      - name: 💾 Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: 📦 Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 🔍 Install dependencies
+        run: pnpm install
+
+      - name: ✅ Check styles # только это отличается
+        run: pnpm lint:css
