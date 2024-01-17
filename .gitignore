@@ -25,3 +25,5 @@ dist-ssr
 src/eventExample.ts
 src/sampleExample.ts
 src/storeExample.ts
+src/any.ts
+src/post-edit-model.ts
