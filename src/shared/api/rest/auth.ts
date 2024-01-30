@@ -15,18 +15,20 @@ const checkError = (error: AuthError | null) => {
   throw error;
 };
 
-export const signInWithEmail = createEffect<{ email: Email }, void, AuthError>(
-  async ({ email }) => {
-    const { error } = await client.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: SITE_URL }, // редирект после singIn
-    });
+export const signInWithEmailFx = createEffect<
+  { email: Email },
+  void,
+  AuthError
+>(async ({ email }) => {
+  const { error } = await client.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: SITE_URL }, // редирект после singIn
+  });
 
-    checkError(error);
-  },
-);
+  checkError(error);
+});
 
-export const getMe = createEffect<void, User | null, AuthError>(async () => {
+export const getMeFx = createEffect<void, User | null, AuthError>(async () => {
   const {
     data: { user },
     error,
@@ -44,7 +46,7 @@ export const getMe = createEffect<void, User | null, AuthError>(async () => {
   return null;
 });
 
-export const singOut = createEffect<void, void, AuthError>(async () => {
+export const singOutFx = createEffect<void, void, AuthError>(async () => {
   const { error } = await client.auth.signOut();
 
   checkError(error);
