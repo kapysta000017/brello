@@ -1,28 +1,20 @@
-import { client } from "@/shared/api/client";
-import { SITE_URL } from "@/shared/config";
 import { AuthError } from "@supabase/supabase-js";
 import { createEffect } from "effector";
 
-export type Email = string;
-export type UserId = Uuid;
-
-export interface User {
-  id: UserId;
-  email: Email;
-}
-
-const checkError = (error: AuthError | null) => {
-  throw error;
-};
+import { client } from "../client";
+import { Email, User, checkError } from "./common";
 
 export const signInWithEmailFx = createEffect<
   { email: Email },
   void,
   AuthError
 >(async ({ email }) => {
+  const baseUrl = document.location.toString();
+  const emailRedirectTo = new URL("/auth/finish", baseUrl).toString();
+
   const { error } = await client.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: SITE_URL }, // редирект после singIn
+    options: { emailRedirectTo },
   });
 
   checkError(error);
@@ -46,7 +38,7 @@ export const getMeFx = createEffect<void, User | null, AuthError>(async () => {
   return null;
 });
 
-export const singOutFx = createEffect<void, void, AuthError>(async () => {
+export const signOutFx = createEffect<void, void, AuthError>(async () => {
   const { error } = await client.auth.signOut();
 
   checkError(error);
